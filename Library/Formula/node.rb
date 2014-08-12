@@ -18,13 +18,17 @@ class Node < Formula
     sha1 "da4a9adb73978710566f643241b2c05fb8a97574"
   end
 
-  head "https://github.com/joyent/node.git"
+  # TODO - change this once https://github.com/joyent/node/pull/7719 lands
+  head "https://github.com/srl295/node.git"
 
   option "enable-debug", "Build with debugger hooks"
   option "without-npm", "npm will not be installed"
   option "without-completion", "npm bash completion will not be installed"
+  option "without-icu4c", "disable Intl support via ICU"
 
   depends_on :python => :build
+  depends_on "icu4c" => :recommended
+  depends_on "pkg-config" => :build # only needed for icu4c though
 
   fails_with :llvm do
     build 2326
@@ -38,6 +42,9 @@ class Node < Formula
   def install
     args = %W{--prefix=#{prefix} --without-npm}
     args << "--debug" if build.include? "enable-debug"
+    # if icu4c is installed, leverage it
+    # only in a special HEAD until https://github.com/joyent/node/pull/7719 lands
+    args << "--with-intl=system-icu" if build.with? "icu4c"
 
     system "./configure", *args
     system "make", "install"
