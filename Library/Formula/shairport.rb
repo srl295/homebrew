@@ -6,6 +6,9 @@ class Shairport < Formula
 
   depends_on 'libao'
 
+  depends_on "pkg-config" => :build
+
+
   def install
     system "mkdir #{bin}"
     inreplace 'Makefile' do |s|
